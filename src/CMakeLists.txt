@@ -10,10 +10,15 @@ set(CMAKE_AUTOUIC ON) # UI files
 # find package
 find_package(Qt5 REQUIRED Widgets)
 find_package(PCL 1.7.1 REQUIRED)
+# find_package(Eigen3)
+# find_package(jsoncpp)
 
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
+
+include_directories(${EIGEN_ROOT})
+
 
 # find source files, header files and ui files
 # aux_source_directory(. DIR_SRCS)
@@ -33,6 +38,7 @@ add_executable(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME}
+    libjsoncpp.a
     ${PCL_LIBRARIES}
     Qt5::Widgets
 )

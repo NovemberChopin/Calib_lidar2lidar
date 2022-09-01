@@ -7,5 +7,7 @@ int main(int argc, char *argv[])
   CloudViewer w;
   w.show();
   return a.exec();
+
+  // cmake -H. -Bbuild2 -DCMAKE_EXPORT_COMPILE_COMMANDS=on
 }
 

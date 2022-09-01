@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1246</width>
-    <height>718</height>
+    <width>1400</width>
+    <height>900</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -68,8 +68,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1246</width>
-     <height>26</height>
+     <width>1400</width>
+     <height>29</height>
     </rect>
    </property>
    <property name="font">
@@ -88,60 +88,6 @@
     <addaction name="saveBinaryAction"/>
     <addaction name="exitAction"/>
    </widget>
-   <widget class="QMenu" name="menuGenerate">
-    <property name="title">
-     <string>Generate</string>
-    </property>
-    <widget class="QMenu" name="menuBasic_shapes">
-     <property name="title">
-      <string>Basic shapes</string>
-     </property>
-     <property name="icon">
-      <iconset resource="cloudviewer.qrc">
-       <normaloff>:/Resources/images/shape.png</normaloff>:/Resources/images/shape.png</iconset>
-     </property>
-     <addaction name="sphereAction"/>
-     <addaction name="cylinderAction"/>
-    </widget>
-    <addaction name="cubeAction"/>
-    <addaction name="menuBasic_shapes"/>
-   </widget>
-   <widget class="QMenu" name="menuAbout">
-    <property name="title">
-     <string>About</string>
-    </property>
-    <addaction name="helpAction"/>
-    <addaction name="aboutAction"/>
-   </widget>
-   <widget class="QMenu" name="menuOption">
-    <property name="title">
-     <string>Option</string>
-    </property>
-    <widget class="QMenu" name="themeAction">
-     <property name="title">
-      <string>Theme</string>
-     </property>
-     <property name="icon">
-      <iconset resource="cloudviewer.qrc">
-       <normaloff>:/Resources/images/theme.png</normaloff>:/Resources/images/theme.png</iconset>
-     </property>
-     <addaction name="windowsThemeAction"/>
-     <addaction name="darculaThemeAction"/>
-    </widget>
-    <widget class="QMenu" name="langAction">
-     <property name="title">
-      <string>Language</string>
-     </property>
-     <property name="icon">
-      <iconset resource="cloudviewer.qrc">
-       <normaloff>:/Resources/images/language.png</normaloff>:/Resources/images/language.png</iconset>
-     </property>
-     <addaction name="englishAction"/>
-     <addaction name="chineseAction"/>
-    </widget>
-    <addaction name="themeAction"/>
-    <addaction name="langAction"/>
-   </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
      <string>Display</string>
@@ -158,47 +104,8 @@
     <addaction name="bgcolorAction"/>
     <addaction name="menuAngle_view"/>
    </widget>
-   <widget class="QMenu" name="menuProcess">
-    <property name="title">
-     <string>Process</string>
-    </property>
-    <addaction name="meshsurfaceAction"/>
-    <addaction name="wireframeAction"/>
-   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
-   <addaction name="menuGenerate"/>
-   <addaction name="menuProcess"/>
-   <addaction name="menuOption"/>
-   <addaction name="menuAbout"/>
-  </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="openAction"/>
-   <addaction name="addAction"/>
-   <addaction name="clearAction"/>
-   <addaction name="saveAction"/>
-   <addaction name="saveBinaryAction"/>
-   <addaction name="separator"/>
-   <addaction name="pointcolorAction"/>
-   <addaction name="bgcolorAction"/>
-   <addaction name="separator"/>
-   <addaction name="mainviewAction"/>
-   <addaction name="leftviewAction"/>
-   <addaction name="topviewAction"/>
-   <addaction name="separator"/>
-   <addaction name="cubeAction"/>
-   <addaction name="separator"/>
-   <addaction name="meshsurfaceAction"/>
-   <addaction name="wireframeAction"/>
-   <addaction name="separator"/>
-   <addaction name="helpAction"/>
-   <addaction name="aboutAction"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="RGBDock">
@@ -617,11 +524,17 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="propertyDock">
+  <widget class="QDockWidget" name="MannualCalibation">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <property name="minimumSize">
     <size>
      <width>250</width>
-     <height>233</height>
+     <height>290</height>
     </size>
    </property>
    <property name="font">
@@ -631,7 +544,7 @@
     </font>
    </property>
    <property name="windowTitle">
-    <string>Properties</string>
+    <string>手动标定</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
@@ -639,113 +552,269 @@
    <widget class="QWidget" name="dockWidgetContents_6">
     <layout class="QVBoxLayout" name="verticalLayout_4">
      <item>
-      <widget class="QTableWidget" name="propertyTable">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>180</height>
-        </size>
+      <widget class="QWidget" name="widget" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-       <property name="font">
-        <font>
-         <pointsize>9</pointsize>
-        </font>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Sunken</enum>
-       </property>
-       <property name="midLineWidth">
-        <number>0</number>
-       </property>
-       <property name="horizontalScrollBarPolicy">
-        <enum>Qt::ScrollBarAsNeeded</enum>
-       </property>
-       <property name="sizeAdjustPolicy">
-        <enum>QAbstractScrollArea::AdjustIgnored</enum>
-       </property>
-       <property name="autoScroll">
-        <bool>true</bool>
-       </property>
-       <property name="editTriggers">
-        <set>QAbstractItemView::NoEditTriggers</set>
-       </property>
-       <property name="tabKeyNavigation">
-        <bool>true</bool>
-       </property>
-       <property name="showDropIndicator" stdset="0">
-        <bool>true</bool>
-       </property>
-       <property name="dragDropOverwriteMode">
-        <bool>true</bool>
-       </property>
-       <property name="alternatingRowColors">
-        <bool>false</bool>
-       </property>
-       <property name="selectionMode">
-        <enum>QAbstractItemView::ExtendedSelection</enum>
-       </property>
-       <property name="textElideMode">
-        <enum>Qt::ElideLeft</enum>
-       </property>
-       <property name="horizontalScrollMode">
-        <enum>QAbstractItemView::ScrollPerItem</enum>
-       </property>
-       <property name="showGrid">
-        <bool>false</bool>
-       </property>
-       <property name="wordWrap">
-        <bool>true</bool>
-       </property>
-       <property name="cornerButtonEnabled">
-        <bool>true</bool>
-       </property>
-       <property name="rowCount">
-        <number>4</number>
-       </property>
-       <property name="columnCount">
-        <number>2</number>
-       </property>
-       <attribute name="horizontalHeaderCascadingSectionResizes">
-        <bool>false</bool>
-       </attribute>
-       <attribute name="horizontalHeaderDefaultSectionSize">
-        <number>100</number>
-       </attribute>
-       <attribute name="horizontalHeaderHighlightSections">
-        <bool>true</bool>
-       </attribute>
-       <attribute name="horizontalHeaderMinimumSectionSize">
-        <number>25</number>
-       </attribute>
-       <attribute name="horizontalHeaderStretchLastSection">
-        <bool>true</bool>
-       </attribute>
-       <attribute name="verticalHeaderVisible">
-        <bool>false</bool>
-       </attribute>
-       <attribute name="verticalHeaderCascadingSectionResizes">
-        <bool>false</bool>
-       </attribute>
-       <row/>
-       <row/>
-       <row/>
-       <row/>
-       <column>
-        <property name="text">
-         <string>Property</string>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <property name="leftMargin">
+         <number>0</number>
         </property>
-        <property name="textAlignment">
-         <set>AlignLeading|AlignVCenter</set>
+        <property name="topMargin">
+         <number>0</number>
         </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>Value</string>
+        <property name="rightMargin">
+         <number>0</number>
         </property>
-        <property name="textAlignment">
-         <set>AlignLeading|AlignVCenter</set>
+        <property name="bottomMargin">
+         <number>0</number>
         </property>
-       </column>
+        <item>
+         <widget class="QPushButton" name="btn_addXD">
+          <property name="text">
+           <string>+ x degree</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_minusXD">
+          <property name="text">
+           <string>- x degree</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QWidget" name="widget_2" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_7">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QPushButton" name="btn_addYD">
+          <property name="text">
+           <string>+ y degree</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_minusYD">
+          <property name="text">
+           <string>- y degree</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QWidget" name="widget_3" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QPushButton" name="btn_addZD">
+          <property name="text">
+           <string>+ z degree</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_minusZD">
+          <property name="text">
+           <string>- z degree</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QWidget" name="widget_4" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_9">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QPushButton" name="btn_addXT">
+          <property name="text">
+           <string>+ x trans</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_minusXT">
+          <property name="text">
+           <string>- x trans</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QWidget" name="widget_5" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_10">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QPushButton" name="btn_addYT">
+          <property name="text">
+           <string>+ y trans</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_minusYT">
+          <property name="text">
+           <string>- y trans</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QWidget" name="widget_6" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_11">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QPushButton" name="btn_addZT">
+          <property name="text">
+           <string>+ z trans</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_minusZT">
+          <property name="text">
+           <string>- z trans</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QWidget" name="widget_7" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_12">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QPushButton" name="btn_reset">
+          <property name="text">
+           <string>Reset</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_save">
+          <property name="text">
+           <string>Save Params</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
     </layout>
@@ -845,7 +914,7 @@
   </widget>
   <action name="openAction">
    <property name="icon">
-    <iconset resource="cloudviewer.qrc">
+    <iconset resource="CloudViewer.qrc">
      <normaloff>:/Resources/images/open.png</normaloff>:/Resources/images/open.png</iconset>
    </property>
    <property name="text">
@@ -860,7 +929,7 @@
   </action>
   <action name="saveAction">
    <property name="icon">
-    <iconset resource="cloudviewer.qrc">
+    <iconset resource="CloudViewer.qrc">
      <normaloff>:/Resources/images/save.png</normaloff>:/Resources/images/save.png</iconset>
    </property>
    <property name="text">
@@ -880,7 +949,7 @@
   </action>
   <action name="cubeAction">
    <property name="icon">
-    <iconset resource="cloudviewer.qrc">
+    <iconset resource="CloudViewer.qrc">
      <normaloff>:/Resources/images/cube.png</normaloff>:/Resources/images/cube.png</iconset>
    </property>
    <property name="text">
@@ -892,7 +961,7 @@
   </action>
   <action name="helpAction">
    <property name="icon">
-    <iconset resource="cloudviewer.qrc">
+    <iconset resource="CloudViewer.qrc">
      <normaloff>:/Resources/images/help.png</normaloff>:/Resources/images/help.png</iconset>
    </property>
    <property name="text">
@@ -904,7 +973,7 @@
   </action>
   <action name="aboutAction">
    <property name="icon">
-    <iconset resource="cloudviewer.qrc">
+    <iconset resource="CloudViewer.qrc">
      <normaloff>:/Resources/images/about.png</normaloff>:/Resources/images/about.png</iconset>
    </property>
    <property name="text">
@@ -916,7 +985,7 @@
   </action>
   <action name="changeAction">
    <property name="icon">
-    <iconset resource="cloudviewer.qrc">
+    <iconset resource="CloudViewer.qrc">
      <normaloff>:/Resources/images/change.png</normaloff>:/Resources/images/change.png</iconset>
    </property>
    <property name="text">
@@ -928,7 +997,7 @@
   </action>
   <action name="exitAction">
    <property name="icon">
-    <iconset resource="cloudviewer.qrc">
+    <iconset resource="CloudViewer.qrc">
      <normaloff>:/Resources/images/exit.png</normaloff>:/Resources/images/exit.png</iconset>
    </property>
    <property name="text">
@@ -940,7 +1009,7 @@
   </action>
   <action name="pointcolorAction">
    <property name="icon">
-    <iconset resource="cloudviewer.qrc">
+    <iconset resource="CloudViewer.qrc">
      <normaloff>:/Resources/images/pointcolor.png</normaloff>:/Resources/images/pointcolor.png</iconset>
    </property>
    <property name="text">
@@ -949,7 +1018,7 @@
   </action>
   <action name="bgcolorAction">
    <property name="icon">
-    <iconset resource="cloudviewer.qrc">
+    <iconset resource="CloudViewer.qrc">
      <normaloff>:/Resources/images/bgcolor.png</normaloff>:/Resources/images/bgcolor.png</iconset>
    </property>
    <property name="text">
@@ -958,7 +1027,7 @@
   </action>
   <action name="mainviewAction">
    <property name="icon">
-    <iconset resource="cloudviewer.qrc">
+    <iconset resource="CloudViewer.qrc">
      <normaloff>:/Resources/images/zhengshi.png</normaloff>:/Resources/images/zhengshi.png</iconset>
    </property>
    <property name="text">
@@ -967,7 +1036,7 @@
   </action>
   <action name="leftviewAction">
    <property name="icon">
-    <iconset resource="cloudviewer.qrc">
+    <iconset resource="CloudViewer.qrc">
      <normaloff>:/Resources/images/zuoshi.png</normaloff>:/Resources/images/zuoshi.png</iconset>
    </property>
    <property name="text">
@@ -976,7 +1045,7 @@
   </action>
   <action name="topviewAction">
    <property name="icon">
-    <iconset resource="cloudviewer.qrc">
+    <iconset resource="CloudViewer.qrc">
      <normaloff>:/Resources/images/fushi.png</normaloff>:/Resources/images/fushi.png</iconset>
    </property>
    <property name="text">
@@ -1029,7 +1098,7 @@
   </action>
   <action name="clearAction">
    <property name="icon">
-    <iconset resource="cloudviewer.qrc">
+    <iconset resource="CloudViewer.qrc">
      <normaloff>:/Resources/images/clear.png</normaloff>:/Resources/images/clear.png</iconset>
    </property>
    <property name="text">
@@ -1038,7 +1107,7 @@
   </action>
   <action name="addAction">
    <property name="icon">
-    <iconset resource="cloudviewer.qrc">
+    <iconset resource="CloudViewer.qrc">
      <normaloff>:/Resources/images/add.png</normaloff>:/Resources/images/add.png</iconset>
    </property>
    <property name="text">
@@ -1047,7 +1116,7 @@
   </action>
   <action name="sphereAction">
    <property name="icon">
-    <iconset resource="cloudviewer.qrc">
+    <iconset resource="CloudViewer.qrc">
      <normaloff>:/Resources/images/sphere.png</normaloff>:/Resources/images/sphere.png</iconset>
    </property>
    <property name="text">
@@ -1056,7 +1125,7 @@
   </action>
   <action name="cylinderAction">
    <property name="icon">
-    <iconset resource="cloudviewer.qrc">
+    <iconset resource="CloudViewer.qrc">
      <normaloff>:/Resources/images/cylinder.png</normaloff>:/Resources/images/cylinder.png</iconset>
    </property>
    <property name="text">
@@ -1065,7 +1134,7 @@
   </action>
   <action name="meshsurfaceAction">
    <property name="icon">
-    <iconset resource="cloudviewer.qrc">
+    <iconset resource="CloudViewer.qrc">
      <normaloff>:/Resources/images/mesh.png</normaloff>:/Resources/images/mesh.png</iconset>
    </property>
    <property name="text">
@@ -1074,7 +1143,7 @@
   </action>
   <action name="wireframeAction">
    <property name="icon">
-    <iconset resource="cloudviewer.qrc">
+    <iconset resource="CloudViewer.qrc">
      <normaloff>:/Resources/images/frame.png</normaloff>:/Resources/images/frame.png</iconset>
    </property>
    <property name="text">
@@ -1103,7 +1172,7 @@
   </action>
   <action name="saveBinaryAction">
    <property name="icon">
-    <iconset resource="cloudviewer.qrc">
+    <iconset resource="CloudViewer.qrc">
      <normaloff>:/Resources/images/saveBinary.png</normaloff>:/Resources/images/saveBinary.png</iconset>
    </property>
    <property name="text">
@@ -1133,7 +1202,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="cloudviewer.qrc"/>
+  <include location="CloudViewer.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -19,13 +19,11 @@
 #include <pcl/visualization/common/common.h>
 #include <pcl/ModelCoefficients.h>
 #include <pcl/PolygonMesh.h>
+#include <json/json.h>
 
 #include <QtWidgets/QMainWindow>
-#include "GBK.h"
 #include "ui_CloudViewer.h"
-#include "AboutWin.h"
 #include "Tools.h"
-#include "MeshProcessing.h"
 #include "FileIO.h"
 
 #include <vector>
@@ -55,12 +53,6 @@
 
 typedef pcl::PointXYZRGBA PointT;
 typedef pcl::PointCloud<PointT> PointCloudT;
-
-const int CLOUDVIEWER_THEME_WINDOWS = 0;
-const int CLOUDVIEWER_THEME_DARCULA = 1;
-
-const int CLOUDVIEWER_LANG_ENGLISH = 0;
-const int CLOUDVIEWER_LANG_CHINESE = 1;
 
 const int CLOUDVIEWER_MODE_POINT = 0;
 const int CLOUDVIEWER_MODE_MESH = 1;
@@ -118,17 +110,6 @@ private:
   void mainview();
   void leftview();
   void topview();
-  // Generate menu slots
-  void cube();
-  void createSphere();
-  void createCylinder();
-  // Process menu slots
-  int convertSurface();  //法线估计、曲面重建、网格面片显示
-  int convertWireframe(); //法线估计、曲面重建、网格线框显示
-
-  // About menu slots
-  void about();
-  void help();
 
   /***** Utils Methods ***/
   void initial();
@@ -137,15 +118,15 @@ private:
 
   void setCloudColor(unsigned int r, unsigned int g, unsigned int b);
 
-  void setPropertyTable();
   void setConsoleTable();
 
   void consoleLog(QString operation, QString subname, QString filename, QString note);
 
 public slots:
+
+  void testEigen();
+
   void save();
-  void changeTheme();
-  void changeLanguage();
 
   void colorBtnPressed();
   void RGBsliderReleased();
