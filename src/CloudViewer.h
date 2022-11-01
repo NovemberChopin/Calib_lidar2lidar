@@ -25,6 +25,7 @@
 #include "ui_CloudViewer.h"
 #include "Tools.h"
 #include "FileIO.h"
+#include "Lidar2Lidar.h"
 
 #include <vector>
 #include <map>
@@ -73,9 +74,12 @@ private:
   Ui::CloudViewerClass ui;
 
   pcl::PointCloud<pcl::PointXYZ>::Ptr xyzCloud;
-  MyCloud mycloud;
+  MyCloud mycloud;      // 暂时先不动
+  MyCloud sourceCloud;  // 需要进行变换的源点云
   std::vector<MyCloud> mycloud_vec;
   boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;
+
+  Lidar2Lidar lidarCalib;
 
   FileIO fileIO;
 
@@ -122,9 +126,13 @@ private:
 
   void consoleLog(QString operation, QString subname, QString filename, QString note);
 
+  void processSourceFrame(MyCloud &sourceCloud, const Eigen::Matrix4d &extrinsic);
+
+  void showPopInfo();   // 弹窗提示
 public slots:
 
-  void testEigen();
+  void loadParams();
+  void showCalibParams();
 
   void save();
 

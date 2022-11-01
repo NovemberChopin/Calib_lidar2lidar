@@ -6,69 +6,18 @@
 #include <string>
 
 
-double cali_scale_degree_ = 0.3;
-double cali_scale_trans_ = 0.06;
-static Eigen::Matrix4d calibration_matrix_ = Eigen::Matrix4d::Identity();
-static Eigen::Matrix4d orign_calibration_matrix_ = Eigen::Matrix4d::Identity();
-std::vector<Eigen::Matrix4d> modification_list_;
-
-void CalibrationInit(Eigen::Matrix4d json_param) {
-  calibration_matrix_ = json_param;
-  orign_calibration_matrix_ = json_param;
-  modification_list_.reserve(12);
-  for (int32_t i = 0; i < 12; i++) {
-    std::vector<int> transform_flag(6, 0);
-    transform_flag[i / 2] = (i % 2) ? (-1) : 1;
-    Eigen::Matrix4d tmp = Eigen::Matrix4d::Identity();
-    Eigen::Matrix3d rot_tmp;
-    rot_tmp =
-        Eigen::AngleAxisd(transform_flag[0] * cali_scale_degree_ / 180.0 * M_PI,
-                          Eigen::Vector3d::UnitX()) *
-        Eigen::AngleAxisd(transform_flag[1] * cali_scale_degree_ / 180.0 * M_PI,
-                          Eigen::Vector3d::UnitY()) *
-        Eigen::AngleAxisd(transform_flag[2] * cali_scale_degree_ / 180.0 * M_PI,
-                          Eigen::Vector3d::UnitZ());
-    tmp.block(0, 0, 3, 3) = rot_tmp;
-    tmp(0, 3) = transform_flag[3] * cali_scale_trans_;
-    tmp(1, 3) = transform_flag[4] * cali_scale_trans_;
-    tmp(2, 3) = transform_flag[5] * cali_scale_trans_;
-    modification_list_[i] = tmp;
-  }
-  std::cout << "=>Calibration scale Init!\n";
-}
-
-
-void CloudViewer::testEigen() {
-    QString fileName = QFileDialog::getOpenFileName(this, "Open Json", "/home/js/Documents", "Open json files(*.json)");
-    Eigen::Matrix4d json_param;
-    LoadExtrinsicJson(fileName.toStdString(), json_param);
-    std::cout << "lidar to lidar extrinsic:\n" << std::endl;
-    std::cout << json_param << std::endl;
-    CalibrationInit(json_param);
-}
-
 
 CloudViewer::CloudViewer(QWidget *parent)
   : QMainWindow(parent) {
   ui.setupUi(this);
 
   /***** Slots connection of QMenuBar and QToolBar *****/
-  // File (connect)
-  QObject::connect(ui.openAction, &QAction::triggered, this, &CloudViewer::open);
-  QObject::connect(ui.addAction, &QAction::triggered, this, &CloudViewer::add);
-  QObject::connect(ui.clearAction, &QAction::triggered, this, &CloudViewer::clear);
 
-  ui.saveAction->setData(QVariant(false));       // isSaveBinary = false
-  ui.saveBinaryAction->setData(QVariant(true));  // isSaveBinary = true
-  connect(ui.saveAction, SIGNAL(triggered()), this, SLOT(save()));
-  connect(ui.saveBinaryAction, SIGNAL(triggered()), this, SLOT(save()));
-  QObject::connect(ui.exitAction, &QAction::triggered, this, &CloudViewer::exit);
-  // Display (connect)
-  QObject::connect(ui.pointcolorAction, &QAction::triggered, this, &CloudViewer::pointcolorChanged);
-  QObject::connect(ui.bgcolorAction, &QAction::triggered, this, &CloudViewer::bgcolorChanged);
-  QObject::connect(ui.mainviewAction, &QAction::triggered, this, &CloudViewer::mainview);
-  QObject::connect(ui.leftviewAction, &QAction::triggered, this, &CloudViewer::leftview);
-  QObject::connect(ui.topviewAction, &QAction::triggered, this, &CloudViewer::topview);
+  // ui.saveAction->setData(QVariant(false));       // isSaveBinary = false
+  // ui.saveBinaryAction->setData(QVariant(true));  // isSaveBinary = true
+  connect(ui.saveFile, SIGNAL(triggered()), this, SLOT(save()));
+  // connect(ui.saveBinaryAction, SIGNAL(triggered()), this, SLOT(save()));
+  connect(ui.exitApp, &QAction::triggered, this, &CloudViewer::exit);
 
 
   /***** Slots connection of RGB widget *****/
@@ -96,6 +45,156 @@ CloudViewer::CloudViewer(QWidget *parent)
   connect(ui.dataTree, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(popMenu(const QPoint&)));
 
   connect(ui.consoleTable, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(popMenuInConsole(const QPoint&)));
+  
+  // Lidar2Lidar 手动标定
+  connect(ui.target_pcl, &QAction::triggered, this, &CloudViewer::open);
+  connect(ui.source_pcl, &QAction::triggered, this, &CloudViewer::add);
+  connect(ui.clear_pcl, &QAction::triggered, this, &CloudViewer::clear);
+  connect(ui.load_param, &QAction::triggered, this, &CloudViewer::loadParams);
+
+  QObject::connect(ui.btn_addXD, &QPushButton::clicked, this, [=](){
+      if (mycloud_vec.size() != 2) {
+        this->showPopInfo();
+        return;
+      }
+      lidarCalib.calib_matrix_ = lidarCalib.calib_matrix_ * lidarCalib.modification_list_[0];
+      consoleLog("调整外参", "旋转", "x轴", "顺时针");
+      processSourceFrame(sourceCloud, lidarCalib.calib_matrix_);
+  });
+
+  QObject::connect(ui.btn_minusXD, &QPushButton::clicked, this, [=](){
+      if (mycloud_vec.size() != 2) {
+        this->showPopInfo();
+        return;
+      }
+      lidarCalib.calib_matrix_ = lidarCalib.calib_matrix_ * lidarCalib.modification_list_[1];
+      consoleLog("调整外参", "旋转", "x轴", "逆时针");
+      processSourceFrame(sourceCloud, lidarCalib.calib_matrix_);
+  });
+
+  QObject::connect(ui.btn_addYD, &QPushButton::clicked, this, [=](){
+      if (mycloud_vec.size() != 2) {
+        this->showPopInfo();
+        return;
+      }
+      lidarCalib.calib_matrix_ = lidarCalib.calib_matrix_ * lidarCalib.modification_list_[2];
+      consoleLog("调整外参", "旋转", "y轴", "顺时针");
+      processSourceFrame(sourceCloud, lidarCalib.calib_matrix_);
+  });
+
+  QObject::connect(ui.btn_minusYD, &QPushButton::clicked, this, [=](){
+      if (mycloud_vec.size() != 2) {
+        this->showPopInfo();
+        return;
+      }
+      lidarCalib.calib_matrix_ = lidarCalib.calib_matrix_ * lidarCalib.modification_list_[3];
+      consoleLog("调整外参", "旋转", "y轴", "逆时针");
+      processSourceFrame(sourceCloud, lidarCalib.calib_matrix_);
+  });
+
+  QObject::connect(ui.btn_addZD, &QPushButton::clicked, this, [=](){
+      if (mycloud_vec.size() != 2) {
+        this->showPopInfo();
+        return;
+      }
+      lidarCalib.calib_matrix_ = lidarCalib.calib_matrix_ * lidarCalib.modification_list_[4];
+      consoleLog("调整外参", "旋转", "z轴", "顺时针");
+      processSourceFrame(sourceCloud, lidarCalib.calib_matrix_);
+  });
+
+  QObject::connect(ui.btn_minusZD, &QPushButton::clicked, this, [=](){
+      if (mycloud_vec.size() != 2) {
+        this->showPopInfo();
+        return;
+      }
+      lidarCalib.calib_matrix_ = lidarCalib.calib_matrix_ * lidarCalib.modification_list_[5];
+      consoleLog("调整外参", "旋转", "z轴", "逆时针");
+      processSourceFrame(sourceCloud, lidarCalib.calib_matrix_);
+  });
+
+  QObject::connect(ui.btn_addXT, &QPushButton::clicked, this, [=](){
+      if (mycloud_vec.size() != 2) {
+        this->showPopInfo();
+        return;
+      }
+      lidarCalib.calib_matrix_ = lidarCalib.calib_matrix_ * lidarCalib.modification_list_[6];
+      consoleLog("调整外参", "平移", "x轴", "正方向");
+      processSourceFrame(sourceCloud, lidarCalib.calib_matrix_);
+  });
+
+  QObject::connect(ui.btn_minusXT, &QPushButton::clicked, this, [=](){
+      if (mycloud_vec.size() != 2) {
+        this->showPopInfo();
+        return;
+      }
+      lidarCalib.calib_matrix_ = lidarCalib.calib_matrix_ * lidarCalib.modification_list_[7];
+      consoleLog("调整外参", "平移", "x轴", "负方向");
+      processSourceFrame(sourceCloud, lidarCalib.calib_matrix_);
+  });
+
+  QObject::connect(ui.btn_addYT, &QPushButton::clicked, this, [=](){
+      if (mycloud_vec.size() != 2) {
+        this->showPopInfo();
+        return;
+      }
+      lidarCalib.calib_matrix_ = lidarCalib.calib_matrix_ * lidarCalib.modification_list_[8];
+      consoleLog("调整外参", "平移", "y轴", "正方向");
+      processSourceFrame(sourceCloud, lidarCalib.calib_matrix_);
+  });
+
+  QObject::connect(ui.btn_minusYT, &QPushButton::clicked, this, [=](){
+      if (mycloud_vec.size() != 2) {
+        this->showPopInfo();
+        return;
+      }
+      lidarCalib.calib_matrix_ = lidarCalib.calib_matrix_ * lidarCalib.modification_list_[9];
+      consoleLog("调整外参", "平移", "y轴", "负方向");
+      processSourceFrame(sourceCloud, lidarCalib.calib_matrix_);
+  });
+
+  QObject::connect(ui.btn_addZT, &QPushButton::clicked, this, [=](){
+      if (mycloud_vec.size() != 2) {
+        this->showPopInfo();
+        return;
+      }
+      lidarCalib.calib_matrix_ = lidarCalib.calib_matrix_ * lidarCalib.modification_list_[10];
+      consoleLog("调整外参", "平移", "z轴", "正方向");
+      processSourceFrame(sourceCloud, lidarCalib.calib_matrix_);
+  });
+
+  QObject::connect(ui.btn_minusZT, &QPushButton::clicked, this, [=](){
+      if (mycloud_vec.size() != 2) {
+        this->showPopInfo();
+        return;
+      }
+      lidarCalib.calib_matrix_ = lidarCalib.calib_matrix_ * lidarCalib.modification_list_[11];
+      consoleLog("调整外参", "平移", "z轴", "负方向");
+      processSourceFrame(sourceCloud, lidarCalib.calib_matrix_);
+  });
+
+  // 重置转移矩阵
+  QObject::connect(ui.btn_reset, &QPushButton::clicked, this, [=](){
+      if (mycloud_vec.size() != 2) {
+        this->showPopInfo();
+        return;
+      }
+      lidarCalib.calib_matrix_ = lidarCalib.orign_calib_matrix_;
+      processSourceFrame(sourceCloud, lidarCalib.calib_matrix_);
+  });
+
+  // 保存结果
+  // QObject::connect(ui.btn_save, &QPushButton::clicked, this, [=](){
+      
+  //     Eigen::Matrix3d rot_matrix = 
+  //         lidarCalib.calib_matrix_.block<3, 3>(0, 0);
+  //     // 旋转向量转欧拉角(Z-Y-X，即RPY)
+  //     Eigen::Vector3d euler_angles = rot_matrix.eulerAngles(2, 1, 0);
+  //     std::cout << "----------------\nRot:\n" << euler_angles.transpose() << std::endl;
+  //     std::cout << "roll yaw pitch\n" << euler_angles.transpose() * 180 / M_PI << std::endl;
+
+  //     Eigen::Vector3d trans = lidarCalib.calib_matrix_.block<3, 1>(0, 3);
+  //     std::cout << "Trans:\n" << trans.transpose() << std::endl;
+  // });
   // Initialization
   initial();
 }
@@ -104,11 +203,89 @@ CloudViewer::~CloudViewer() {
 
 }
 
+
+void CloudViewer::showPopInfo() {
+    QMessageBox::information(this, "注意", "请先加载目标点云和源点云数据后执行调整操作！");
+}
+
+
+void CloudViewer::showCalibParams() {
+    ui.textBrowser->clear();
+
+    // 输出 Matrix
+    // ui.textBrowser->insertPlainText("Matirx: \n");
+    // for (int i=0; i<lidarCalib.calib_matrix_.rows(); i++) {
+    //     QString res = QString("%1 %2 %3 %4\n").arg(lidarCalib.calib_matrix_(i, 0))
+    //             .arg(lidarCalib.calib_matrix_(i, 1))
+    //             .arg(lidarCalib.calib_matrix_(i, 2))
+    //             .arg(lidarCalib.calib_matrix_(i, 3));
+    //     ui.textBrowser->insertPlainText(res);
+    // }
+
+    // 输出标定参数
+    Eigen::Matrix3d rot_matrix = 
+          lidarCalib.calib_matrix_.block<3, 3>(0, 0);
+    
+    Eigen::Vector3d euler_angles = rot_matrix.eulerAngles(0, 1, 2);
+    Eigen::Vector3d angles = euler_angles * 180 / M_PI;
+    ui.textBrowser->insertPlainText(QString("旋转角度：\n"));
+    ui.textBrowser->insertPlainText(QString("pitch: %1\n").arg(angles(0)));
+    ui.textBrowser->insertPlainText(QString("yaw: %1\n").arg(angles(1)));
+    ui.textBrowser->insertPlainText(QString("roll: %1\n").arg(angles(2)));
+
+    Eigen::Vector3d trans = lidarCalib.calib_matrix_.block<3, 1>(0, 3);
+    ui.textBrowser->insertPlainText(QString("平移量：\n"));
+    ui.textBrowser->insertPlainText(QString("x: %1\n").arg(trans(0)));
+    ui.textBrowser->insertPlainText(QString("y: %1\n").arg(trans(1)));
+    ui.textBrowser->insertPlainText(QString("z: %1\n").arg(trans(2)));
+}
+
+void CloudViewer::loadParams() {
+    QString fileName = QFileDialog::getOpenFileName(this, "Open Json", "/home/js/Documents", "Open json files(*.json)");
+    Eigen::Matrix4d json_param;
+    LoadExtrinsicJson(fileName.toStdString(), json_param);
+    std::cout << "lidar to lidar extrinsic:\n" << std::endl;
+    std::cout << json_param << std::endl;
+    consoleLog("雷达标定", "点云数据", "加载外参文件", "");
+
+    lidarCalib.setCalibMatrix(json_param);
+    if (mycloud_vec.size() == 2) {
+      // 若已经加载了点云数据，则根据参数来旋转点云
+      processSourceFrame(sourceCloud, lidarCalib.calib_matrix_);
+    }
+    // 在 textBrowser 中显示
+    showCalibParams();
+}
+
+void CloudViewer::processSourceFrame(MyCloud &sourceCloud, const Eigen::Matrix4d &extrinsic) {
+    std::cout << "extrinsic:" << std::endl;
+    std::cout << extrinsic << std::endl;
+    int pointsNum = sourceCloud.cloud->points.size();
+    for (int i=0; i<pointsNum; i++) {
+        Eigen::Vector4d pointPos(sourceCloud.cloud->points[i].x,
+                                 sourceCloud.cloud->points[i].y,
+                                 sourceCloud.cloud->points[i].z, 1.0);
+
+        Eigen::Vector4d trans_p = extrinsic * pointPos;
+        mycloud_vec[1].cloud->points[i].x = trans_p.x();
+        mycloud_vec[1].cloud->points[i].y = trans_p.y();
+        mycloud_vec[1].cloud->points[i].z = trans_p.z();
+    }
+    
+    // 更新点云展示数据
+    showPointcloud();
+    // 更新 textBrowser 参数展示
+    showCalibParams();
+}
+
+
 void CloudViewer::doOpen(const QStringList& filePathList) {
   // Open point cloud file one by one
   for (int i = 0; i != filePathList.size(); i++) {
     timeStart(); // time start
     mycloud.cloud.reset(new PointCloudT); // Reset cloud
+    
+    sourceCloud.cloud.reset(new PointCloudT); 
     QFileInfo fileInfo(filePathList[i]);
     std::string filePath = fromQString(fileInfo.filePath());
     std::string fileName = fromQString(fileInfo.fileName());
@@ -120,6 +297,7 @@ void CloudViewer::doOpen(const QStringList& filePathList) {
     );
 
     mycloud = fileIO.load(fileInfo);
+    sourceCloud = fileIO.load(fileInfo);    // 保存 源点云数据
     if (!mycloud.isValid) {
       // TODO: deal with the error, print error info in console?
       debug("invalid cloud.");
@@ -131,16 +309,16 @@ void CloudViewer::doOpen(const QStringList& filePathList) {
     timeCostSecond = timeOff(); // time off
 
     consoleLog(
-      "Open",
+      "打开",
       toQString(mycloud.fileName),
       toQString(mycloud.filePath),
-      "Time cost: " + timeCostSecond + " s, Points: " + QString::number(mycloud.cloud->points.size())
+      "耗时: " + timeCostSecond + " s, 点云数: " + QString::number(mycloud.cloud->points.size())
     );
 
     // update tree widget
     QTreeWidgetItem *cloudName = new QTreeWidgetItem(QStringList()
       << toQString(mycloud.fileName));
-    cloudName->setIcon(0, QIcon(":/Resources/images/icon.png"));
+    cloudName->setIcon(0, QIcon(":/Resources/images/logo.jpg"));
     ui.dataTree->addTopLevelItem(cloudName);
 
     total_points += mycloud.cloud->points.size();
@@ -167,6 +345,8 @@ void CloudViewer::open() {
   viewer->removeAllPointClouds();
 
   doOpen(filePathList);
+
+  ui.target_pcl->setEnabled(false);
 }
 
 // Add Point Cloud
@@ -180,6 +360,15 @@ void CloudViewer::add() {
   if (filePathList.isEmpty()) return;
 
   doOpen(filePathList);
+
+  processSourceFrame(sourceCloud, lidarCalib.calib_matrix_);
+
+  ui.source_pcl->setEnabled(false);
+  // 打印 mycloud 点云
+  // std::cout << "------ mycloud --------\n";
+  // for (int i=0; i<5; i++) {
+  //   std::cout << sourceCloud.cloud->points[i].x << " " << sourceCloud.cloud->points[i].y << " " << sourceCloud.cloud->points[i].z << std::endl;
+  // }
 }
 
 // Clear all point clouds
@@ -188,7 +377,9 @@ void CloudViewer::clear() {
   viewer->removeAllPointClouds();  // 从viewer中移除所有点云
   viewer->removeAllShapes(); // 这个remove更彻底
   ui.dataTree->clear();  // 将dataTree清空
-
+  ui.textBrowser->clear();
+  ui.target_pcl->setEnabled(true);
+  ui.source_pcl->setEnabled(true);
   // 输出窗口
   consoleLog("Clear", "All point clouds", "", "");
 
@@ -306,8 +497,8 @@ void CloudViewer::exit() {
 // 初始化
 void CloudViewer::initial() {
   // 界面初始化
-  setWindowIcon(QIcon(tr(":/Resources/images/icon.png")));
-  setWindowTitle(tr("CloudViewer"));
+  setWindowIcon(QIcon(tr(":/Resources/images/logo.jpg")));
+  setWindowTitle(tr("雷达标定"));
 
   // 点云初始化
   mycloud.cloud.reset(new PointCloudT);
@@ -325,7 +516,7 @@ void CloudViewer::initial() {
   setConsoleTable();
 
   // 输出窗口
-  consoleLog("Software start", "CloudViewer", "Welcome to use CloudViewer", "Nightn");
+  consoleLog("软件启动", "Lidar2lidar", "欢迎使用雷达外参手动标定程序", "主题：白");
 
   // 设置背景颜色为 dark
   viewer->setBackgroundColor(30 / 255.0, 30 / 255.0, 30 / 255.0);
@@ -380,7 +571,7 @@ void CloudViewer::colorBtnPressed() {
     }
 
     // 输出窗口
-    consoleLog("Random color", "All point clous", "", "");
+    // consoleLog("随机颜色", "All point clous", "", "");
 
   }
   else{
@@ -394,7 +585,7 @@ void CloudViewer::colorBtnPressed() {
     }
 
     // 输出窗口
-    consoleLog("Random color", "Point clouds selected", "", "");
+    // consoleLog("随机颜色", "Point clouds selected", "", "");
   }
   showPointcloud();
 }
@@ -409,7 +600,7 @@ void CloudViewer::RGBsliderReleased() {
     }
 
     // 输出窗口
-    consoleLog("Change cloud color", "All point clouds", QString::number(red) + " " + QString::number(green) + " " + QString::number(blue), "");
+    consoleLog("改变颜色", "所有点云", QString::number(red) + " " + QString::number(green) + " " + QString::number(blue), "");
   }
   else{
     for (int i = 0; i != selected_item_count; i++) {
@@ -417,7 +608,7 @@ void CloudViewer::RGBsliderReleased() {
       mycloud_vec[cloud_id].setPointColor(red, green, blue);
     }
     // 输出窗口
-    consoleLog("Change cloud color", "Point clouds selected", QString::number(red) + " " + QString::number(green) + " " + QString::number(blue), "");
+    consoleLog("改变颜色", "选中的点云", QString::number(red) + " " + QString::number(green) + " " + QString::number(blue), "");
   }
   showPointcloud();
 }
@@ -432,7 +623,7 @@ void CloudViewer::psliderReleased() {
         p, mycloud_vec[i].cloudId);
     }
     // 输出窗口
-    consoleLog("Change cloud size", "All point clouds", "Size: " + QString::number(p), "");
+    consoleLog("改变点云尺寸", "所有点云", "尺寸: " + QString::number(p), "");
   }
   else{
     for (int i = 0; i != selected_item_count; i++){
@@ -441,7 +632,7 @@ void CloudViewer::psliderReleased() {
         p, mycloud_vec[i].cloudId);
     }
     // 输出窗口
-    consoleLog("Change cloud size", "Point clouds selected", "Size: " + QString::number(p), "");
+    consoleLog("改变点云尺寸", "所有点云", "尺寸: " + QString::number(p), "");
   }
   ui.screen->update();
 }
@@ -514,7 +705,7 @@ void CloudViewer::pointcolorChanged() {
         mycloud_vec[i].setPointColor(color.red(), color.green(), color.blue());
       }
       // 输出窗口
-      consoleLog("Change cloud color", "All point clouds", QString::number(color.red()) + " " + QString::number(color.green()) + " " + QString::number(color.blue()), "");
+      consoleLog("改变颜色", "所有点云", QString::number(color.red()) + " " + QString::number(color.green()) + " " + QString::number(color.blue()), "");
     }
     else {
       for (int i = 0; i != selected_item_count; i++) {
@@ -522,7 +713,7 @@ void CloudViewer::pointcolorChanged() {
         mycloud_vec[cloud_id].setPointColor(color.red(), color.green(), color.blue());
       }
       // 输出窗口
-      consoleLog("Change cloud color", "Point clouds selected", QString::number(color.red()) + " " + QString::number(color.green()) + " " + QString::number(color.blue()), "");
+      consoleLog("改变颜色", "选择点云", QString::number(color.red()) + " " + QString::number(color.green()) + " " + QString::number(color.blue()), "");
     }
     // 颜色的改变同步至RGB停靠窗口
     ui.rSlider->setValue(color.red());
@@ -531,35 +722,6 @@ void CloudViewer::pointcolorChanged() {
 
     showPointcloud();
   }
-}
-
-// 通过颜色对话框改变背景颜色
-void CloudViewer::bgcolorChanged() {
-  QColor color = QColorDialog::getColor(Qt::white, this,
-    "Select color for point cloud");
-  if (color.isValid()) {
-    viewer->setBackgroundColor(color.red() / 255.0,
-      color.green() / 255.0, color.blue() / 255.0);
-    // 输出窗口
-    consoleLog("Change bg color", "Background", QString::number(color.red()) + " " + QString::number(color.green()) + " " + QString::number(color.blue()), "");
-    showPointcloud();
-  }
-}
-
-// 三视图
-void CloudViewer::mainview() {
-  viewer->setCameraPosition(0, -1, 0, 0.5, 0.5, 0.5, 0, 0, 1);
-  ui.screen->update();
-}
-
-void CloudViewer::leftview() {
-  viewer->setCameraPosition(-1, 0, 0, 0, 0, 0, 0, 0, 1);
-  ui.screen->update();
-}
-
-void CloudViewer::topview() {
-  viewer->setCameraPosition(0, 0, 1, 0, 0, 0, 0, 1, 0);
-  ui.screen->update();
 }
 
 
@@ -682,74 +844,77 @@ void CloudViewer::popMenu(const QPoint&) {
   int id = ui.dataTree->indexOfTopLevelItem(curItem);
   MyCloud& myCloud = mycloud_vec[id];
 
-  QAction hideItemAction("Hide", this);
-  QAction showItemAction("Show", this);
+  // QAction hideItemAction("Hide", this);
+  // QAction showItemAction("Show", this);
   QAction deleteItemAction("Delete", this);
   QAction changeColorAction("Change color", this);
   // show mode
-  QAction pointModeAction("Set point mode", this);
-  QAction meshModeAction("Set mesh mode", this);
-  QAction pointMeshModeAction("Set point+mesh mode", this);
-  pointModeAction.setData(QVariant(CLOUDVIEWER_MODE_POINT));
-  meshModeAction.setData(QVariant(CLOUDVIEWER_MODE_MESH));
-  pointMeshModeAction.setData(QVariant(CLOUDVIEWER_MODE_POINT_MESH));
+  // QAction pointModeAction("Set point mode", this);
+  // QAction meshModeAction("Set mesh mode", this);
+  // QAction pointMeshModeAction("Set point+mesh mode", this);
+  // pointModeAction.setData(QVariant(CLOUDVIEWER_MODE_POINT));
+  // meshModeAction.setData(QVariant(CLOUDVIEWER_MODE_MESH));
+  // pointMeshModeAction.setData(QVariant(CLOUDVIEWER_MODE_POINT_MESH));
 
-  pointModeAction.setCheckable(true);
-  meshModeAction.setCheckable(true);
-  pointMeshModeAction.setCheckable(true);
+  // pointModeAction.setCheckable(true);
+  // meshModeAction.setCheckable(true);
+  // pointMeshModeAction.setCheckable(true);
 
-  if (myCloud.curMode == "point") {
-    pointModeAction.setChecked(true);
-  }
-  else if (myCloud.curMode == "mesh") {
-    meshModeAction.setChecked(true);
-  }
-  else if (myCloud.curMode == "point+mesh") {
-    pointMeshModeAction.setChecked(true);
-  }
+  // if (myCloud.curMode == "point") {
+  //   pointModeAction.setChecked(true);
+  // }
+  // else if (myCloud.curMode == "mesh") {
+  //   meshModeAction.setChecked(true);
+  // }
+  // else if (myCloud.curMode == "point+mesh") {
+  //   pointMeshModeAction.setChecked(true);
+  // }
 
-  connect(&hideItemAction, &QAction::triggered, this, &CloudViewer::hideItem);
-  connect(&showItemAction, &QAction::triggered, this, &CloudViewer::showItem);
+  // connect(&hideItemAction, &QAction::triggered, this, &CloudViewer::hideItem);
+  // connect(&showItemAction, &QAction::triggered, this, &CloudViewer::showItem);
   connect(&deleteItemAction, &QAction::triggered, this, &CloudViewer::deleteItem);
   connect(&changeColorAction, &QAction::triggered, this, &CloudViewer::pointcolorChanged);
 
-  connect(&pointModeAction, SIGNAL(triggered()), this, SLOT(setRenderingMode()));
-  connect(&meshModeAction, SIGNAL(triggered()), this, SLOT(setRenderingMode()));
-  connect(&pointMeshModeAction, SIGNAL(triggered()), this, SLOT(setRenderingMode()));
+  // connect(&pointModeAction, SIGNAL(triggered()), this, SLOT(setRenderingMode()));
+  // connect(&meshModeAction, SIGNAL(triggered()), this, SLOT(setRenderingMode()));
+  // connect(&pointMeshModeAction, SIGNAL(triggered()), this, SLOT(setRenderingMode()));
 
   QPoint pos;
   QMenu menu(ui.dataTree);
-  menu.addAction(&hideItemAction);
-  menu.addAction(&showItemAction);
+  // menu.addAction(&hideItemAction);
+  // menu.addAction(&showItemAction);
   menu.addAction(&deleteItemAction);
   menu.addAction(&changeColorAction);
 
-  menu.addAction(&pointModeAction);
-  menu.addAction(&meshModeAction);
-  menu.addAction(&pointMeshModeAction);
+  // menu.addAction(&pointModeAction);
+  // menu.addAction(&meshModeAction);
+  // menu.addAction(&pointMeshModeAction);
 
-  if (mycloud_vec[id].visible == true){
-    menu.actions()[1]->setVisible(false);
-    menu.actions()[0]->setVisible(true);
-  }
-  else{
-    menu.actions()[1]->setVisible(true);
-    menu.actions()[0]->setVisible(false);
-  }
+  // if (mycloud_vec[id].visible == true){
+  //   menu.actions()[1]->setVisible(false);
+  //   menu.actions()[0]->setVisible(true);
+  // }
+  // else{
+  //   menu.actions()[1]->setVisible(true);
+  //   menu.actions()[0]->setVisible(false);
+  // }
 
-  const vector<string> modes = myCloud.supportedModes;
-  if (std::find(modes.begin(), modes.end(), "point") == modes.end()) {
-    menu.actions()[4]->setVisible(false);
-  }
-  if (std::find(modes.begin(), modes.end(), "mesh") == modes.end()) {
-    menu.actions()[5]->setVisible(false);
-  }
-  if (std::find(modes.begin(), modes.end(), "point+mesh") == modes.end()) {
-    menu.actions()[6]->setVisible(false);
-  }
+  // const vector<string> modes = myCloud.supportedModes;
+  // if (std::find(modes.begin(), modes.end(), "point") == modes.end()) {
+  //   menu.actions()[4]->setVisible(false);
+  // }
+  // if (std::find(modes.begin(), modes.end(), "mesh") == modes.end()) {
+  //   menu.actions()[5]->setVisible(false);
+  // }
+  // if (std::find(modes.begin(), modes.end(), "point+mesh") == modes.end()) {
+  //   menu.actions()[6]->setVisible(false);
+  // }
 
   menu.exec(QCursor::pos()); // 在当前鼠标位置显示
 }
+
+
+
 void CloudViewer::hideItem() {
   QList<QTreeWidgetItem*> itemList = ui.dataTree->selectedItems();
   for (int i = 0; i != ui.dataTree->selectedItems().size(); i++){
@@ -830,7 +995,7 @@ void CloudViewer::deleteItem() {
   }
 
   // 输出窗口
-  consoleLog("Delete point clouds", "Point clouds selected", "", "");
+  consoleLog("删除点云", "删除选择点云", "", "");
 
   ui.screen->update();
 

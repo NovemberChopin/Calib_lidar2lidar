@@ -4,11 +4,13 @@
 
 ## 目录
 
-- [环境搭建](#环境搭建)
-  - [PCL安装](#PCL安装)
-  - [Qt安装](#Qt安装)
-  - [环境变量配置](#环境变量配置)
-- [CloudViewer编译运行](#CloudViewer编译运行)
+- [在 Linux 编译 CloudViewer](#在-linux-编译-cloudviewer)
+  - [目录](#目录)
+  - [环境搭建](#环境搭建)
+    - [PCL安装](#pcl安装)
+    - [Qt安装](#qt安装)
+    - [环境变量配置](#环境变量配置)
+  - [CloudViewer编译运行](#cloudviewer编译运行)
 
 ## 环境搭建
 
@@ -67,6 +69,8 @@ git clone https://github.com/nightn/CloudViewer.git
 
 ```shell
 cmake -H. -Bbuild -DCMAKE_EXPORT_COMPILE_COMMANDS=on
+
+cmake -H. -Bbuild -DCMAKE_EXPORT_COMPILE_COMMANDS=on -DCMAKE_BUILD_TYPE="Release"
 ```
 
 使用 make 构建。

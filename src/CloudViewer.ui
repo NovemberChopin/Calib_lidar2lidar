@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1400</width>
-    <height>900</height>
+    <width>1411</width>
+    <height>952</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -29,7 +29,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>CloudViewer</string>
+   <string>Lidar2Lidar</string>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -63,71 +63,39 @@
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1400</width>
-     <height>29</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>微软雅黑</family>
-    </font>
-   </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
-    <addaction name="openAction"/>
-    <addaction name="addAction"/>
-    <addaction name="clearAction"/>
-    <addaction name="saveAction"/>
-    <addaction name="saveBinaryAction"/>
-    <addaction name="exitAction"/>
-   </widget>
-   <widget class="QMenu" name="menuView">
-    <property name="title">
-     <string>Display</string>
-    </property>
-    <widget class="QMenu" name="menuAngle_view">
-     <property name="title">
-      <string>Angle view</string>
-     </property>
-     <addaction name="mainviewAction"/>
-     <addaction name="leftviewAction"/>
-     <addaction name="topviewAction"/>
-    </widget>
-    <addaction name="pointcolorAction"/>
-    <addaction name="bgcolorAction"/>
-    <addaction name="menuAngle_view"/>
-   </widget>
-   <addaction name="menuFile"/>
-   <addaction name="menuView"/>
-  </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="RGBDock">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <property name="minimumSize">
     <size>
-     <width>245</width>
-     <height>400</height>
+     <width>250</width>
+     <height>344</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>300</width>
-     <height>524287</height>
+     <width>250</width>
+     <height>400</height>
     </size>
    </property>
    <property name="windowTitle">
-    <string>RGB</string>
+    <string>调整颜色</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_4">
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -160,6 +128,13 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="font">
+            <font>
+             <weight>50</weight>
+             <bold>false</bold>
+             <kerning>false</kerning>
+            </font>
+           </property>
            <property name="autoFillBackground">
             <bool>false</bool>
            </property>
@@ -183,6 +158,9 @@
            </property>
            <property name="mode">
             <enum>QLCDNumber::Dec</enum>
+           </property>
+           <property name="segmentStyle">
+            <enum>QLCDNumber::Flat</enum>
            </property>
            <property name="value" stdset="0">
             <double>255.000000000000000</double>
@@ -254,6 +232,9 @@
            <property name="digitCount">
             <number>3</number>
            </property>
+           <property name="segmentStyle">
+            <enum>QLCDNumber::Flat</enum>
+           </property>
            <property name="intValue" stdset="0">
             <number>255</number>
            </property>
@@ -321,6 +302,12 @@
            <property name="digitCount">
             <number>3</number>
            </property>
+           <property name="mode">
+            <enum>QLCDNumber::Dec</enum>
+           </property>
+           <property name="segmentStyle">
+            <enum>QLCDNumber::Flat</enum>
+           </property>
            <property name="intValue" stdset="0">
             <number>255</number>
            </property>
@@ -386,7 +373,7 @@
             <number>1</number>
            </property>
            <property name="segmentStyle">
-            <enum>QLCDNumber::Filled</enum>
+            <enum>QLCDNumber::Flat</enum>
            </property>
            <property name="intValue" stdset="0">
             <number>1</number>
@@ -435,7 +422,7 @@
           <string notr="true"/>
          </property>
          <property name="text">
-          <string>Color</string>
+          <string>颜色</string>
          </property>
         </widget>
        </item>
@@ -450,7 +437,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Coordinate</string>
+        <string>坐标系</string>
        </property>
       </widget>
      </item>
@@ -463,7 +450,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Backgronud:Dark/Light</string>
+        <string>背景颜色：黑/白</string>
        </property>
       </widget>
      </item>
@@ -473,13 +460,13 @@
   <widget class="QDockWidget" name="dataDock">
    <property name="minimumSize">
     <size>
-     <width>250</width>
+     <width>200</width>
      <height>233</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>300</width>
+     <width>250</width>
      <height>524287</height>
     </size>
    </property>
@@ -490,7 +477,7 @@
     </font>
    </property>
    <property name="windowTitle">
-    <string>PointCloud</string>
+    <string>点云文件</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
@@ -516,7 +503,7 @@
        </property>
        <column>
         <property name="text">
-         <string>Point Cloud File</string>
+         <string>文件列表</string>
         </property>
        </column>
       </widget>
@@ -533,8 +520,14 @@
    </property>
    <property name="minimumSize">
     <size>
-     <width>250</width>
+     <width>200</width>
      <height>290</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>250</width>
+     <height>524287</height>
     </size>
    </property>
    <property name="font">
@@ -803,14 +796,7 @@
         <item>
          <widget class="QPushButton" name="btn_reset">
           <property name="text">
-           <string>Reset</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btn_save">
-          <property name="text">
-           <string>Save Params</string>
+           <string>重置</string>
           </property>
          </widget>
         </item>
@@ -824,7 +810,7 @@
    <property name="minimumSize">
     <size>
      <width>200</width>
-     <height>140</height>
+     <height>185</height>
     </size>
    </property>
    <property name="maximumSize">
@@ -834,7 +820,7 @@
     </size>
    </property>
    <property name="windowTitle">
-    <string>Console</string>
+    <string>控制台</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>8</number>
@@ -856,7 +842,7 @@
         <number>5</number>
        </property>
        <attribute name="horizontalHeaderVisible">
-        <bool>true</bool>
+        <bool>false</bool>
        </attribute>
        <attribute name="horizontalHeaderDefaultSectionSize">
         <number>200</number>
@@ -912,6 +898,45 @@
     </layout>
    </widget>
   </widget>
+  <widget class="QDockWidget" name="showDock">
+   <property name="windowTitle">
+    <string>标定参数</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QVBoxLayout" name="verticalLayout_6">
+     <item>
+      <widget class="QTextBrowser" name="textBrowser">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="target_pcl"/>
+   <addaction name="source_pcl"/>
+   <addaction name="load_param"/>
+   <addaction name="clear_pcl"/>
+   <addaction name="saveFile"/>
+   <addaction name="exitApp"/>
+  </widget>
   <action name="openAction">
    <property name="icon">
     <iconset resource="CloudViewer.qrc">
@@ -928,6 +953,9 @@
    </property>
   </action>
   <action name="saveAction">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="CloudViewer.qrc">
      <normaloff>:/Resources/images/save.png</normaloff>:/Resources/images/save.png</iconset>
@@ -936,7 +964,7 @@
     <string>Save</string>
    </property>
    <property name="statusTip">
-    <string>save the file</string>
+    <string>保存点云文件</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -1190,6 +1218,36 @@
   <action name="actionRotate90">
    <property name="text">
     <string>Rotate90</string>
+   </property>
+  </action>
+  <action name="target_pcl">
+   <property name="text">
+    <string>目标点云</string>
+   </property>
+  </action>
+  <action name="source_pcl">
+   <property name="text">
+    <string>源点云</string>
+   </property>
+  </action>
+  <action name="load_param">
+   <property name="text">
+    <string>加载参数</string>
+   </property>
+  </action>
+  <action name="clear_pcl">
+   <property name="text">
+    <string>清空</string>
+   </property>
+  </action>
+  <action name="saveFile">
+   <property name="text">
+    <string>保存</string>
+   </property>
+  </action>
+  <action name="exitApp">
+   <property name="text">
+    <string>退出</string>
    </property>
   </action>
  </widget>

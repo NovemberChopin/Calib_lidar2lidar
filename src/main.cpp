@@ -8,6 +8,6 @@ int main(int argc, char *argv[])
   w.show();
   return a.exec();
 
-  // cmake -H. -Bbuild2 -DCMAKE_EXPORT_COMPILE_COMMANDS=on
+  // cmake -H. -Bbuild -DCMAKE_EXPORT_COMPILE_COMMANDS=on
 }
 
