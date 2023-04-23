@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(CloudViewer)
+project(Lidar2Lidar)
 
 add_subdirectory(src)
