@@ -15,3 +15,6 @@ build2
 log
 .vscode
 
+package/
+doc/
+

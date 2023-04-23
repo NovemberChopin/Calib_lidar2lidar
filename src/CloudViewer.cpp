@@ -331,7 +331,7 @@ void CloudViewer::doOpen(const QStringList& filePathList) {
 void CloudViewer::open() {
   QStringList filePathList = QFileDialog::getOpenFileNames(
     this,
-    tr("Open point cloud file"),
+    tr("选择目标点云文件"),
     toQString(mycloud.fileDir),
     toQString(fileIO.getInputFormatsStr())
   );
@@ -353,7 +353,7 @@ void CloudViewer::open() {
 void CloudViewer::add() {
   QStringList filePathList = QFileDialog::getOpenFileNames(
     this,
-    tr("Add point cloud file"),
+    tr("选择源点云文件"),
     toQString(mycloud.fileDir),
     toQString(fileIO.getInputFormatsStr())
   );
@@ -381,17 +381,17 @@ void CloudViewer::clear() {
   ui.target_pcl->setEnabled(true);
   ui.source_pcl->setEnabled(true);
   // 输出窗口
-  consoleLog("Clear", "All point clouds", "", "");
+  consoleLog("清空", "所有点云", "", "");
 
-  setWindowTitle("CloudViewer");  // 更新窗口标题
+  setWindowTitle("雷达标定");  // 更新窗口标题
   showPointcloud();  // 更新显示
 }
 
 // Save point cloud
 void CloudViewer::save() {
   if (!mycloud.isValid) {
-    QMessageBox::critical(this, tr("Saving file error"),
-      tr("There is no point cloud to save"));
+    QMessageBox::critical(this, tr("保存失败"),
+      tr("没有文件需要保存"));
     return;
   }
 
@@ -403,7 +403,7 @@ void CloudViewer::save() {
   QString selectedFilter = toQString(fileIO.outputFiltersMap.at(mycloud.fileSuffix));
   QString saveFilePath = QFileDialog::getSaveFileName(
     this,                                    // parent
-    toQString("Save point cloud" + string(isSaveBinary ? " (binary)": "")), // caption
+    toQString("保存点云" + string(isSaveBinary ? " (binary)": "")), // caption
     toQString(mycloud.filePath),             // dir
     toQString(fileIO.getOutputFormatsStr()), // filter
     &selectedFilter                          // selected filter
@@ -422,16 +422,16 @@ void CloudViewer::save() {
 
   bool saveStatus = fileIO.save(mycloud, fileInfo, isSaveBinary);
   if (!saveStatus) {
-    QMessageBox::critical(this, tr("Saving file error"),
-      tr("We can not save the file"));
+    QMessageBox::critical(this, tr("保存出错"),
+      tr("保存文件失败，请检查文件后缀"));
     return;
   }
 
-  consoleLog("Save", saveFileName, saveFilePath, "Single save");
+  consoleLog("保存", saveFileName, saveFilePath, "");
 
-  setWindowTitle(saveFilePath + " - CloudViewer");
-  QMessageBox::information(this, tr("save point cloud file"),
-    toQString("Save " + saveFileNameStd + " successfully!"));
+  setWindowTitle(saveFilePath + " - 雷达标定");
+  QMessageBox::information(this, tr("保存点云文件"),
+    toQString("保存 " + saveFileNameStd + " 成功!"));
 }
 
 // Save multi point cloud
@@ -468,15 +468,15 @@ void CloudViewer::savemulti(const QFileInfo& fileInfo, bool isSaveBinary) {
   // save multi_cloud
   bool saveStatus = fileIO.save(multiMyCloud, fileInfo, isSaveBinary);
   if (!saveStatus) {
-    QMessageBox::critical(this, tr("Saving file error"),
-      tr("We can not save the file"));
+    QMessageBox::critical(this, tr("保存出错"),
+      tr("不能保存文件"));
     return;
   }
 
   if (isSaveBinary) {
     consoleLog("Save as binary", QString::fromLocal8Bit(subname.c_str()), saveFilePath, "Multi save (binary)");
   } else {
-    consoleLog("Save", QString::fromLocal8Bit(subname.c_str()), saveFilePath, "Multi save");
+    consoleLog("保存", QString::fromLocal8Bit(subname.c_str()), saveFilePath, "保存多个文件");
   }
 
   // 将保存后的 multi_cloud 设置为当前 mycloud,以便保存之后直接进行操作
@@ -484,8 +484,8 @@ void CloudViewer::savemulti(const QFileInfo& fileInfo, bool isSaveBinary) {
   mycloud.filePath = fromQString(saveFilePath);
   mycloud.fileName = subname;
 
-  setWindowTitle(saveFilePath + " - CloudViewer");
-  QMessageBox::information(this, tr("save point cloud file"), toQString("Save " + subname + " successfully!"));
+  setWindowTitle(saveFilePath + " - 雷达标定");
+  QMessageBox::information(this, tr("保存点云文件"), toQString("保存 " + subname + " 成功!"));
 }
 
 // 退出程序
@@ -883,7 +883,7 @@ void CloudViewer::popMenu(const QPoint&) {
   QMenu menu(ui.dataTree);
   // menu.addAction(&hideItemAction);
   // menu.addAction(&showItemAction);
-  menu.addAction(&deleteItemAction);
+  // menu.addAction(&deleteItemAction);     // 删除操作暂时不添加，
   menu.addAction(&changeColorAction);
 
   // menu.addAction(&pointModeAction);
