@@ -13,6 +13,8 @@
 运行方式：
 
 ```bash
+git clone https://github.com/NovemberChopin/Calib_lidar2lidar.git
+cd Calib_lidar2lidar
 make build && cd build
 cmake ..
 make -j4
@@ -23,7 +25,7 @@ make -j4
 
 软件截图：
 
-<img src="/home/js/.config/Typora/typora-user-images/image-20230423110832381.png" alt="image-20230423110832381"  />
+![image-20230423110832381](imgs/image-20230423110832381.png)
 
 最上方为工具栏：
 
@@ -42,11 +44,11 @@ make -j4
 
 点击`目标点云`按钮选择示例文件：
 
-![image-20230423110903380](/home/js/.config/Typora/typora-user-images/image-20230423110903380.png)
+![image-20230423110903380](imgs/image-20230423110903380.png)
 
 此时可以通过左侧点击文件名，右键打开颜色对话框选择点云颜色。或者可以通过右侧RGB区域手动调整RGB的值：
 
-![image-20230423110924071](/home/js/.config/Typora/typora-user-images/image-20230423110924071.png)
+![image-20230423110924071](imgs/image-20230423110924071.png)
 
 同样点击`源点云`按钮选择示例文件并展示：
 
@@ -68,7 +70,7 @@ make -j4
 
 标定过程就是点击左侧按钮不断调整源点云的位置，使得与目标点云重合，过程中外参会实时显示在右侧结果展示区域。下面是标定好的结果：
 
-![image-20230423110959265](/home/js/.config/Typora/typora-user-images/image-20230423110959265.png)
+![image-20230423110959265](imgs/image-20230423110959265.png)
 
 或者可以直接加载示例文件中调整好的外参文件
 
