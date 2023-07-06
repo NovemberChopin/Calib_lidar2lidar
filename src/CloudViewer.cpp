@@ -385,6 +385,10 @@ void CloudViewer::clear() {
 
   setWindowTitle("雷达标定");  // 更新窗口标题
   showPointcloud();  // 更新显示
+
+  // 将标定好的参数清空
+  lidarCalib.calib_matrix_ = Eigen::Matrix4d::Identity();
+  lidarCalib.orign_calib_matrix_ = Eigen::Matrix4d::Identity();
 }
 
 // Save point cloud
@@ -629,7 +633,7 @@ void CloudViewer::psliderReleased() {
     for (int i = 0; i != selected_item_count; i++){
       int cloud_id = ui.dataTree->indexOfTopLevelItem(itemList[i]);
       viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE,
-        p, mycloud_vec[i].cloudId);
+        p, mycloud_vec[cloud_id].cloudId);
     }
     // 输出窗口
     consoleLog("改变点云尺寸", "所有点云", "尺寸: " + QString::number(p), "");
@@ -883,7 +887,7 @@ void CloudViewer::popMenu(const QPoint&) {
   QMenu menu(ui.dataTree);
   // menu.addAction(&hideItemAction);
   // menu.addAction(&showItemAction);
-  // menu.addAction(&deleteItemAction);     // 删除操作暂时不添加，
+  menu.addAction(&deleteItemAction);     // 删除操作暂时不添加，
   menu.addAction(&changeColorAction);
 
   // menu.addAction(&pointModeAction);
