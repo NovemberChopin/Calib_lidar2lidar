@@ -509,7 +509,7 @@ void CloudViewer::exit() {
 void CloudViewer::initial() {
   // 界面初始化
   setWindowIcon(QIcon(tr(":/Resources/images/logo.jpg")));
-  setWindowTitle(tr("雷达标定"));
+  setWindowTitle(tr("激光雷达外参标定程序"));
 
   // 点云初始化
   mycloud.cloud.reset(new PointCloudT);
