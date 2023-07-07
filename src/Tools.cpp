@@ -88,9 +88,9 @@ void SaveExtrinsicYaml(const std::string &filename, Eigen::Matrix4d &extrinsic) 
   config["rotation"]["roll"] = angles(2);
 
   Eigen::Vector3d trans = extrinsic.block<3, 1>(0, 3);
-  config["trans"]["x"] = angles(0);
-  config["trans"]["y"] = angles(1);
-  config["trans"]["z"] = angles(2);
+  config["trans"]["x"] = trans(0);
+  config["trans"]["y"] = trans(1);
+  config["trans"]["z"] = trans(2);
 
   fout << config;
   fout.close();
