@@ -54,27 +54,54 @@ string joinStrVec(const vector<string> v, string splitor) {
 }
 
 
-void LoadExtrinsicJson(const std::string &filename, Eigen::Matrix4d &extrinsic) {
-    Json::Reader reader;
-    Json::Value root;
-    std::ifstream in(filename, std::ios::binary);
-    // std::ifstream in;
-    // in.open(filename);
-    if (!in.is_open()) {
-    std::cout << "Error Opening " << filename << std::endl;
-    return;
+void LoadExtrinsicYaml(const std::string &filename, Eigen::Matrix4d &extrinsic) {
+  YAML::Node config = YAML::LoadFile(filename);
+  std::vector<double> vec;
+  for (YAML::const_iterator it=config["extrinsicMat"].begin(); it != config["extrinsicMat"].end(); ++it) {
+    vec.push_back(it->as<double>());
+  }
+  // 将vector 数据写入 Eigen 矩阵
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      extrinsic(i, j) = vec[j + i*4];
     }
-    if (reader.parse(in, root, false)) {
-    auto name = root.getMemberNames();
-    std::string id = *(name.begin());
-    std::cout << id << std::endl;
-    Json::Value data = root[id]["param"]["sensor_calib"]["data"];
-    extrinsic << data[0][0].asDouble(), data[0][1].asDouble(), data[0][2].asDouble(), data[0][3].asDouble(),
-                data[1][0].asDouble(), data[1][1].asDouble(), data[1][2].asDouble(), data[1][3].asDouble(),
-                data[2][0].asDouble(), data[2][1].asDouble(), data[2][2].asDouble(), data[2][3].asDouble(),
-                data[3][0].asDouble(), data[3][1].asDouble(), data[3][2].asDouble(), data[3][3].asDouble();
-    }
-    in.close();
-    return;
+  }
 }
 
+
+void SaveExtrinsicYaml(const std::string &filename, Eigen::Matrix4d &extrinsic) {
+  
+  std::ofstream fout(filename);
+  std::vector<double> vec;
+  YAML::Node config;
+  // std::cout << extrinsic << std::endl;
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      vec.push_back(extrinsic(i, j));
+    }
+  }
+  config["extrinsicMat"] = vec;
+
+  Eigen::Vector3d angles = getRotation(extrinsic);
+  config["rotation"]["pitch"] = angles(0);
+  config["rotation"]["yaw"] = angles(1);
+  config["rotation"]["roll"] = angles(2);
+
+  Eigen::Vector3d trans = extrinsic.block<3, 1>(0, 3);
+  config["trans"]["x"] = angles(0);
+  config["trans"]["y"] = angles(1);
+  config["trans"]["z"] = angles(2);
+
+  fout << config;
+  fout.close();
+}
+
+
+Eigen::Vector3d getRotation(Eigen::Matrix4d &extrinsic) {
+  Eigen::Matrix3d rot_matrix = 
+        extrinsic.block<3, 3>(0, 0);
+  
+  Eigen::Vector3d euler_angles = rot_matrix.eulerAngles(0, 1, 2);
+  Eigen::Vector3d angles = euler_angles * 180 / M_PI;
+  return angles;
+}

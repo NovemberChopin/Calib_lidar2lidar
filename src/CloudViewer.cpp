@@ -241,9 +241,9 @@ void CloudViewer::showCalibParams() {
 }
 
 void CloudViewer::loadParams() {
-    QString fileName = QFileDialog::getOpenFileName(this, "Open Json", "/home/js/Documents", "Open json files(*.json)");
+    QString fileName = QFileDialog::getOpenFileName(this, "Open params file", "./", "Open json files(*.yaml)");
     Eigen::Matrix4d json_param;
-    LoadExtrinsicJson(fileName.toStdString(), json_param);
+    LoadExtrinsicYaml(fileName.toStdString(), json_param);
     std::cout << "lidar to lidar extrinsic:\n" << std::endl;
     std::cout << json_param << std::endl;
     consoleLog("雷达标定", "点云数据", "加载外参文件", "");
@@ -442,6 +442,12 @@ void CloudViewer::save() {
 void CloudViewer::savemulti(const QFileInfo& fileInfo, bool isSaveBinary) {
   string subname = fromQString(fileInfo.fileName());
   QString saveFilePath = fileInfo.filePath();
+  // 首先保存标定参数
+  std::string saveFilePathStd = fromQString(saveFilePath);
+  saveFilePathStd = saveFilePathStd.substr(0, saveFilePathStd.size() - 3) + "yaml";
+  // std::cout << "saveFilePathStd: " << saveFilePathStd << std::endl;
+  SaveExtrinsicYaml(saveFilePathStd, lidarCalib.calib_matrix_);
+
   PointCloudT::Ptr multi_cloud;
   multi_cloud.reset(new PointCloudT);
   multi_cloud->height = 1;
@@ -489,7 +495,8 @@ void CloudViewer::savemulti(const QFileInfo& fileInfo, bool isSaveBinary) {
   mycloud.fileName = subname;
 
   setWindowTitle(saveFilePath + " - 雷达标定");
-  QMessageBox::information(this, tr("保存点云文件"), toQString("保存 " + subname + " 成功!"));
+  std::string yamlname = subname.substr(0, subname.size()-3) + "yaml";
+  QMessageBox::information(this, tr("保存文件"), toQString("保存融合点云 " + subname + " 成功!\n保存外参矩阵 " + yamlname + "成功"));
 }
 
 // 退出程序

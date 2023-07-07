@@ -8,10 +8,11 @@
 
 #include <fstream>
 #include <iostream>
-#include <json/json.h>
 #include <stdio.h>
 #include <string>
 #include <vector>
+#include "../include/yaml-cpp/yaml.h"
+
 
 #include <Eigen/Core>
 
@@ -36,7 +37,10 @@ string fromQString(const QString& qs);
 
 string joinStrVec(const vector<string> v, string splitor = " ");
 
-void LoadExtrinsicJson(const std::string &filename, Eigen::Matrix4d &extrinsic);
+void LoadExtrinsicYaml(const std::string &filename, Eigen::Matrix4d &extrinsic);
+void SaveExtrinsicYaml(const std::string &filename, Eigen::Matrix4d &extrinsic);
+
+Eigen::Vector3d getRotation(Eigen::Matrix4d &extrinsic);
 
 #endif
 

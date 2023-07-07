@@ -18,6 +18,7 @@ link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
 include_directories(${EIGEN_ROOT})
+include_directories(${CMAKE_HOME_DIRECTORY}/include)
 
 
 # find source files, header files and ui files
@@ -38,7 +39,7 @@ add_executable(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME}
-    libjsoncpp.a
     ${PCL_LIBRARIES}
     Qt5::Widgets
+    ${CMAKE_HOME_DIRECTORY}/libs/libyaml-cpp.a
 )
